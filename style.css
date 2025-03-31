@@ -21,7 +21,7 @@ body {
 }
 
 h1 {
-    font-size: 28px;
+    font-size: 32px;
     margin-bottom: 20px;
 }
 
@@ -60,7 +60,6 @@ h2 {
     background: #3e8e41;
 }
 
-/* Settings Screen */
 .setting {
     margin-bottom: 15px;
     text-align: left;
@@ -72,8 +71,7 @@ h2 {
     font-size: 14px;
 }
 
-.setting input, 
-.setting select {
+.setting input {
     width: 100%;
     padding: 8px;
     border: 1px solid #ddd;
@@ -81,7 +79,6 @@ h2 {
     box-sizing: border-box;
 }
 
-/* Game Screen */
 .info-panel {
     display: flex;
     justify-content: space-between;
@@ -121,29 +118,22 @@ h2 {
     color: white;
 }
 
-.btn-pause:hover {
-    background: #0b7dda;
-}
-
 .btn-exit {
     background: #f44336;
     color: white;
 }
 
-.btn-exit:hover {
-    background: #da190b;
-}
-
-/* Game Board */
 .game-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    width: 540px;
+    height: 648px;
     gap: 10px;
 }
 
 .card {
     aspect-ratio: 3/4;
-    height: 80px;
+    height: 170px;
     background: #e0e0e0;
     display: flex;
     align-items: center;
@@ -162,10 +152,15 @@ h2 {
 
 .card.flipped {
     background: #FFD700;
-    transform: rotateY(180deg);
+    transform: rotateY(360deg);
+    transition-delay: 5ms
+}
+.description {
+    font-size: 14px;
+    margin-top: 10px;
+    color: #666;
 }
 
-/* Responsive */
 @media (max-width: 600px) {
     .game-container {
         grid-template-columns: repeat(3, 1fr);

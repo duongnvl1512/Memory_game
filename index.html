@@ -13,21 +13,19 @@
             <button class="btn" onclick="startGame()">Start Game</button>
             <button class="btn btn-settings" onclick="showSettings()">Settings</button>
         </div>
+        <div class="description">
+            <div>CÙNG VP BANK X UNIONPAY MỞ TRỌN GÓI ƯU ĐÃI</div>
+            <br>Lật mở các cặp thẻ để chọn ra các ưu đãi giống nhau
+            <br>Có 6 cặp hình giống nhau tương ứng với 6 địa danh nổi tiếng trung quốc và 6 ưu đãi của dòng thẻ
+            <br>Trong vòng 10s người chơi phải lật mở đủ các cặp dành chiến thắng
+        </div>
     </div>
 
     <div id="settingsScreen" class="screen" style="display: none;">
         <h2>Game Settings</h2>
         <div class="setting">
             <label for="timeLimit">Time Limit (seconds):</label>
-            <input type="number" id="timeLimit" min="30" max="300" value="120">
-        </div>
-        <div class="setting">
-            <label for="cardPairs">Number of Pairs:</label>
-            <select id="cardPairs">
-                <option value="4">4 Pairs</option>
-                <option value="6" selected>6 Pairs</option>
-                <option value="8">8 Pairs</option>
-            </select>
+            <input type="number" id="timeLimit" min="30" max="300" value="20">
         </div>
         <button class="btn" onclick="saveSettings()">Save Settings</button>
     </div>

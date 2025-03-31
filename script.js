@@ -1,13 +1,13 @@
 let matchedPairs = 0;
-let totalPairs = 6;
-let values = ['A', 'B', 'C', 'D', 'E', 'F', 'A', 'B', 'C', 'D', 'E', 'F'];
+const totalPairs = 6; // Fixed at 6 pairs
+const values = ['A', 'B', 'C', 'D', 'E', 'F', 'A', 'B', 'C', 'D', 'E', 'F'];
 let firstCard = null, secondCard = null;
 let isProcessing = false;
 let timer = null;
 let seconds = 0;
 let score = 0;
 let isPaused = false;
-let timeLimit = 120;
+let timeLimit = 20;
 let gameTimer = null;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -35,22 +35,8 @@ function showSettings() {
 
 function saveSettings() {
     timeLimit = parseInt(document.getElementById("timeLimit").value);
-    const pairs = parseInt(document.getElementById("cardPairs").value);
-    
-    if (pairs === 4) {
-        values = ['A', 'B', 'C', 'D', 'A', 'B', 'C', 'D'];
-        totalPairs = 4;
-    } else if (pairs === 6) {
-        values = ['A', 'B', 'C', 'D', 'E', 'F', 'A', 'B', 'C', 'D', 'E', 'F'];
-        totalPairs = 6;
-    } else if (pairs === 8) {
-        values = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-        totalPairs = 8;
-    }
-    
     document.getElementById("settingsScreen").style.display = "none";
     document.getElementById("startScreen").style.display = "block";
-    createCards();
 }
 
 function startGame() {
