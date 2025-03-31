@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Game</title>
+    <title>Memory Game with Canvas</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="startScreen" class="screen">
-        <h1>Memory Game</h1>
+        <h1>Minigame</h1>
         <div class="btn-group">
             <button class="btn" onclick="startGame()">Start Game</button>
             <button class="btn btn-settings" onclick="showSettings()">Settings</button>
         </div>
         <div class="description">
-            <div>CÙNG VP BANK X UNIONPAY MỞ TRỌN GÓI ƯU ĐÃI</div>
+            <div class="description-title">CÙNG VP BANK X UNIONPAY MỞ TRỌN GÓI ƯU ĐÃI</div>
+            <div class="description-content">
             <br>Lật mở các cặp thẻ để chọn ra các ưu đãi giống nhau
-            <br>Có 6 cặp hình giống nhau tương ứng với 6 địa danh nổi tiếng trung quốc và 6 ưu đãi của dòng thẻ
-            <br>Trong vòng 10s người chơi phải lật mở đủ các cặp dành chiến thắng
+            <br>Có 6 cặp hình giống nhau tương ứng với 6 địa danh nổi tiếng Trung Quốc
+            <br>Trong vòng 10s người chơi phải lật mở đủ các cặp để dành chiến thắng</div>
         </div>
     </div>
 
@@ -25,7 +26,7 @@
         <h2>Game Settings</h2>
         <div class="setting">
             <label for="timeLimit">Time Limit (seconds):</label>
-            <input type="number" id="timeLimit" min="30" max="300" value="20">
+            <input type="number" id="timeLimit" min="30" max="300" value="10">
         </div>
         <button class="btn" onclick="saveSettings()">Save Settings</button>
     </div>
@@ -33,12 +34,13 @@
     <div id="gameContainer" style="display: none;">
         <div class="info-panel">
             <div class="timer">Time: <span id="time">00</span></div>
+            <div class="score">Score: <span id="scoreDisplay">0</span></div>
             <div class="controls">
                 <button class="btn-sm btn-pause" onclick="togglePause()">Pause</button>
                 <button class="btn-sm btn-exit" onclick="exitGame()">Exit</button>
             </div>
         </div>
-        <div class="game-container" id="gameBoard"></div>
+        <canvas id="gameCanvas"></canvas>
     </div>
 
     <div id="congratsScreen" class="screen" style="display: none;">
