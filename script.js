@@ -15,11 +15,10 @@ let firstCard = null, secondCard = null;
 let matchedPairs = 0;
 let isProcessing = false;
 let isPaused = false;
-let seconds = 0;
-let score = 0;
 let timer = null;
 let gameTimer = null;
-let timeLimit = 60;
+let timeLimit = 10;
+let seconds = timeLimit;
 let images = {};
 
 // Initialize game
@@ -213,18 +212,13 @@ function checkMatch() {
     if (firstCard.imagePath === secondCard.imagePath) {
         firstCard.isMatched = true;
         secondCard.isMatched = true;
-        matchedPairs++;
-        score += 10;
-        document.getElementById("scoreDisplay").textContent = score;
-        
+        matchedPairs++;        
         if (matchedPairs === TOTAL_PAIRS) {
             endGame();
         }
     } else {
         firstCard.isFlipped = false;
         secondCard.isFlipped = false;
-        score = Math.max(0, score - 2);
-        document.getElementById("scoreDisplay").textContent = score;
     }
     
     firstCard = null;
@@ -251,8 +245,6 @@ function checkMatch() {
         firstCard.isMatched = true;
         secondCard.isMatched = true;
         matchedPairs++;
-        score += 10;
-        document.getElementById("scoreDisplay").textContent = score;
         
         if (matchedPairs === TOTAL_PAIRS) {
             endGame();
@@ -260,8 +252,6 @@ function checkMatch() {
     } else {
         firstCard.isFlipped = false;
         secondCard.isFlipped = false;
-        score = Math.max(0, score - 2);
-        document.getElementById("scoreDisplay").textContent = score;
     }
     
     firstCard = null;
@@ -270,63 +260,39 @@ function checkMatch() {
     drawAllCards();
 }
 
-// Keep all your existing game management functions (startGame, endGame, etc.)
-// Only need to modify them to use canvas instead of DOM elements
-
 function startGame() {
     document.getElementById("startScreen").style.display = "none";
     document.getElementById("gameContainer").style.display = "block";
     
     matchedPairs = 0;
-    seconds = 0;
-    score = 0;
-    document.getElementById("time").textContent = "00";
-    document.getElementById("scoreDisplay").textContent = "0";
+    seconds = timeLimit; // Đặt thời gian bắt đầu bằng giới hạn thời gian
+    document.getElementById("time").textContent = seconds.toString().padStart(2, '0');
     
     createCards();
     
     clearInterval(timer);
     timer = setInterval(updateTimer, 1000);
-    
-    if (timeLimit > 0) {
-        clearTimeout(gameTimer);
-        gameTimer = setTimeout(() => {
-            clearInterval(timer);
-            alert(`Time's up! Your score: ${score}`);
-            restartGame();
-        }, timeLimit * 1000);
-    }
 }
 
 function updateTimer() {
     if (!isPaused) {
-        seconds++;
+        seconds--;
         document.getElementById("time").textContent = seconds.toString().padStart(2, '0');
+        
+        if (seconds <= 0) {
+            clearInterval(timer);
+            window.location.href = "gameover.html"; // Chuyển hướng sang trang gameover.html
+        }
     }
 }
+
 
 function endGame() {
     clearInterval(timer);
     clearTimeout(gameTimer);
-    document.getElementById("gameContainer").style.display = "none";
-    document.getElementById("congratsScreen").style.display = "block";
-    document.getElementById("finalTime").textContent = seconds;
-    document.getElementById("finalScore").textContent = score;
+    window.location.href = "complete.html"; // Chuyển hướng sang trang win.html
 }
 
-function togglePause() {
-    isPaused = !isPaused;
-    document.querySelector(".btn-pause").textContent = isPaused ? "Resume" : "Pause";
-    if (!isPaused) {
-        drawAllCards();
-    }
-}
-
-function exitGame() {
-    if (confirm("Are you sure you want to exit?")) {
-        restartGame();
-    }
-}
 
 function restartGame() {
     location.reload();
