@@ -16,7 +16,7 @@ let matchedPairs = 0;
 let isProcessing = false;
 let isPaused = false;
 let timer = null;
-let timeLimit = 10;
+let timeLimit = 100;
 let seconds = timeLimit;
 let images = {};
 
@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     if (startButton) {
         startButton.addEventListener("click", () => {
-            window.location.href = "index.html"; // Chuyển hướng sang trang chơi game
+            window.location.href = "gameplay.html"; // Chuyển hướng sang trang chơi game
         });
     }
 });
