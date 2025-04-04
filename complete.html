@@ -3,9 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Over</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8f8f8;
+        }
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+    </style>
 </head>
-<body style="display: grid;padding-left: 33%; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f8f8f8;">
-    <img src="logo/complete.png" alt="Game Over" style="width: 50%; height: auto;">
+<body>
+    <img src="logo/complete.png" alt="Completed">
+    <script>
+        setTimeout(function() {
+            window.location.href = "startScreen.html";
+        }, 10000); 
+    </script>
 </body>
-
 </html>

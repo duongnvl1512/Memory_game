@@ -110,34 +110,34 @@ h2 {
 .card {
     aspect-ratio: 3/4;
     height: 170px;
-    background: #e0e0e0;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 24px;
-    font-weight: bold;
-    border-radius: 5px;
+    border-radius: 35px !important;
     cursor: pointer;
     transition: transform 0.3s;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     position: relative;
+    overflow: hidden;
 }
 
 .card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 5px;
+    border-radius: 35px !important;
 }
 
 .card::before {
-    content: "?";
+
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 24px;
     font-weight: bold;
+    border-radius: 35px !important;
 }
 
 .card:hover {
@@ -147,8 +147,9 @@ h2 {
 .card.flipped {
     background: #FFD700;
     transform: rotateY(360deg);
-    transition-delay: 5ms
+    transition-delay: 5ms;
 }
+
 
 /*settings*/
 .btn-settings {
@@ -182,9 +183,9 @@ h2 {
 .info-panel {
     display: inline-flex;
     border: 2px solid #4CAF50;
-    padding: 10px 5px;
-    border-radius: 5px;
-    margin-bottom: 15px;
+    padding: 5px;
+    border-radius: 15px;
+    margin-bottom: 10px;
     background-color: #fff;
 }
 
@@ -200,7 +201,6 @@ h2 {
     gap: 10px;
 }
 
-/* btn game-container */
 .btn-sm {
     padding: 6px 12px;
     font-size: 14px;
@@ -214,6 +214,11 @@ h2 {
     transform: translateY(-1px);
 }
 
+.game-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
 
 @media (max-width: 600px) {
     .game-container {
