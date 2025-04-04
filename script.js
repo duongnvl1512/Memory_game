@@ -1,6 +1,6 @@
 // Game constants
-const CARD_WIDTH = 90;
-const CARD_HEIGHT = 135;
+const CARD_WIDTH = 120;
+const CARD_HEIGHT = 160;
 const CARD_PADDING = 10;
 const TOTAL_PAIRS = 6;
 const IMAGE_PATHS = [
@@ -15,9 +15,11 @@ let firstCard = null, secondCard = null;
 let matchedPairs = 0;
 let isProcessing = false;
 let isPaused = false;
+let seconds = 0;
+let score = 0;
 let timer = null;
-let timeLimit = 100;
-let seconds = timeLimit;
+let gameTimer = null;
+let timeLimit = 60;
 let images = {};
 
 // Initialize game
@@ -36,47 +38,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    const startButton = document.getElementById("startGameButton");
-    
-    if (startButton) {
-        startButton.addEventListener("click", () => {
-            window.location.href = "gameplay.html"; // Chuyển hướng sang trang chơi game
-        });
-    }
-});
-
-
-// Load images
 async function loadImages() {
-    const loadPromises = IMAGE_PATHS.map(path => loadImage(path));
-    
-    // Load default card-back image
-    const backImagePromise = loadImage('images/defaultcard.png');
-
-    // Wait for all images to load
-    await Promise.all([...loadPromises, backImagePromise]);
-}
-
-// Helper function to load an image
-function loadImage(path) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.src = path;
-        img.onload = () => {
-            console.log(`Loaded: ${path}`);
-            images[path] = img;
-            resolve();
-        };
-        img.onerror = () => {
-            console.error(`Error loading: ${path}`);
-            images[path] = createErrorImage();
-            resolve();
-        };
+    const loadPromises = IMAGE_PATHS.map((path) => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = path;
+            img.onload = () => {
+                console.log(`Loaded: ${path}`);
+                images[path] = img;
+                resolve();
+            };
+            img.onerror = () => {
+                console.error(`Error loading: ${path}`);
+                images[path] = createErrorImage();
+                resolve();
+            };
+        });
     });
+    
+    await Promise.all(loadPromises);
 }
 
-// Create an error image
 function createErrorImage() {
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = CARD_WIDTH;
@@ -88,14 +70,13 @@ function createErrorImage() {
     tempCtx.fillStyle = '#333';
     tempCtx.font = '16px Arial';
     tempCtx.textAlign = 'center';
-    tempCtx.fillText('Image Missing', CARD_WIDTH / 2, CARD_HEIGHT / 2);
+    tempCtx.fillText('Image Missing', CARD_WIDTH/2, CARD_HEIGHT/2);
     
     const img = new Image();
     img.src = tempCanvas.toDataURL();
     return img;
 }
 
-// Handle click on canvas
 function handleCanvasClick(e) {
     if (isProcessing || isPaused) return;
     
@@ -116,7 +97,6 @@ function handleCanvasClick(e) {
     }
 }
 
-// Create cards
 function createCards() {
     cards = [];
     const allPaths = [...IMAGE_PATHS, ...IMAGE_PATHS];
@@ -136,7 +116,7 @@ function createCards() {
                     y: row * (CARD_HEIGHT + CARD_PADDING) + CARD_PADDING,
                     width: CARD_WIDTH,
                     height: CARD_HEIGHT,
-                    imagePath: allPaths[index],  // Set image for card
+                    imagePath: allPaths[index],
                     isFlipped: false,
                     isMatched: false
                 });
@@ -147,7 +127,6 @@ function createCards() {
     drawAllCards();
 }
 
-// Draw all cards
 function drawAllCards() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
@@ -162,127 +141,61 @@ function drawAllCards() {
     });
 }
 
-// Draw card back
 function drawCardBack(card) {
-    ctx.save();
-    ctx.beginPath();
-
-    // Rounded corners
-    const radius = 20;
-    ctx.moveTo(card.x + radius, card.y);
-    ctx.lineTo(card.x + card.width - radius, card.y);
-    ctx.quadraticCurveTo(card.x + card.width, card.y, card.x + card.width, card.y + radius);
-    ctx.lineTo(card.x + card.width, card.y + card.height - radius);
-    ctx.quadraticCurveTo(card.x + card.width, card.y + card.height, card.x + card.width - radius, card.y + card.height);
-    ctx.lineTo(card.x + radius, card.y + card.height);
-    ctx.quadraticCurveTo(card.x, card.y + card.height, card.x, card.y + card.height - radius);
-    ctx.lineTo(card.x, card.y + radius);
-    ctx.quadraticCurveTo(card.x, card.y, card.x + radius, card.y);
-    ctx.closePath();
-    
-    ctx.clip(); // Clip the content within the rounded shape
-
-    // Draw back image
-    const backImage = images['images/defaultcard.png'];
-    if (backImage && backImage.complete) {
-        ctx.drawImage(backImage, card.x, card.y, card.width, card.height);
-    } else {
-        ctx.fillStyle = '#e0e0e0';
-        ctx.fillRect(card.x, card.y, card.width, card.height);
-    }
-
-    // Draw border
+    ctx.fillStyle = '#e0e0e0';
+    ctx.fillRect(card.x, card.y, card.width, card.height);
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.restore();
+    ctx.strokeRect(card.x, card.y, card.width, card.height);
+    
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 36px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('?', card.x + card.width/2, card.y + card.height/2);
 }
 
-// Draw flipped card
 function drawFlippedCard(card) {
     ctx.clearRect(card.x, card.y, card.width, card.height);
     
     const img = images[card.imagePath];
     if (img && img.complete) {
-        ctx.save();
-        ctx.beginPath();
-        
-        // Rounded corners
-        const radius = 20;
-        ctx.moveTo(card.x + radius, card.y);
-        ctx.lineTo(card.x + card.width - radius, card.y);
-        ctx.quadraticCurveTo(card.x + card.width, card.y, card.x + card.width, card.y + radius);
-        ctx.lineTo(card.x + card.width, card.y + card.height - radius);
-        ctx.quadraticCurveTo(card.x + card.width, card.y + card.height, card.x + card.width - radius, card.y + card.height);
-        ctx.lineTo(card.x + radius, card.y + card.height);
-        ctx.quadraticCurveTo(card.x, card.y + card.height, card.x, card.y + card.height - radius);
-        ctx.lineTo(card.x, card.y + radius);
-        ctx.quadraticCurveTo(card.x, card.y, card.x + radius, card.y);
-        ctx.closePath();
-        
-        ctx.clip(); // Clip the content within the rounded shape
-        
-        // Draw image
-        ctx.drawImage(img, card.x, card.y, card.width, card.height);
-        
-        ctx.restore();
+        try {
+            ctx.drawImage(img, card.x, card.y, card.width, card.height);
+        } catch (e) {
+            console.error("Error drawing image:", e);
+            drawErrorCard(card);
+        }
     } else {
         drawErrorCard(card);
     }
     
-    // Yellow border on flipped card
     ctx.strokeStyle = '#FFD700';
     ctx.lineWidth = 3;
     ctx.strokeRect(card.x, card.y, card.width, card.height);
 }
 
-// Draw error card
 function drawErrorCard(card) {
     ctx.fillStyle = '#ffcccc';
     ctx.fillRect(card.x, card.y, card.width, card.height);
     ctx.fillStyle = '#333';
     ctx.font = '16px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('Image Error', card.x + card.width / 2, card.y + card.height / 2);
+    ctx.fillText('Image Error', card.x + card.width/2, card.y + card.height/2);
 }
 
-// Draw matched card
 function drawMatchedCard(card) {
     const img = images[card.imagePath];
     if (img && img.complete) {
-        ctx.save();
-        ctx.beginPath();
-
-        // Rounded corners
-        const radius = 20;
-        ctx.moveTo(card.x + radius, card.y);
-        ctx.lineTo(card.x + card.width - radius, card.y);
-        ctx.quadraticCurveTo(card.x + card.width, card.y, card.x + card.width, card.y + radius);
-        ctx.lineTo(card.x + card.width, card.y + card.height - radius);
-        ctx.quadraticCurveTo(card.x + card.width, card.y + card.height, card.x + card.width - radius, card.y + card.height);
-        ctx.lineTo(card.x + radius, card.y + card.height);
-        ctx.quadraticCurveTo(card.x, card.y + card.height, card.x, card.y + card.height - radius);
-        ctx.lineTo(card.x, card.y + radius);
-        ctx.quadraticCurveTo(card.x, card.y, card.x + radius, card.y);
-        ctx.closePath();
-
-        ctx.clip(); // Clip the content within the rounded shape
-
-        // Draw image
         ctx.drawImage(img, card.x, card.y, card.width, card.height);
-        
-        ctx.restore();
     } else {
         drawErrorCard(card);
     }
-
-    // Green highlight for matched card
+    
     ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
     ctx.fillRect(card.x, card.y, card.width, card.height);
 }
 
-// Flip card
 function flipCard(card) {
     card.isFlipped = true;
     drawAllCards();
@@ -296,12 +209,13 @@ function flipCard(card) {
     }
 }
 
-// Check if two flipped cards match
 function checkMatch() {
     if (firstCard.imagePath === secondCard.imagePath) {
         firstCard.isMatched = true;
         secondCard.isMatched = true;
         matchedPairs++;
+        score += 10;
+        document.getElementById("scoreDisplay").textContent = score;
         
         if (matchedPairs === TOTAL_PAIRS) {
             endGame();
@@ -309,6 +223,8 @@ function checkMatch() {
     } else {
         firstCard.isFlipped = false;
         secondCard.isFlipped = false;
+        score = Math.max(0, score - 2);
+        document.getElementById("scoreDisplay").textContent = score;
     }
     
     firstCard = null;
@@ -317,82 +233,112 @@ function checkMatch() {
     drawAllCards();
 }
 
-// Start the game
+function flipCard(card) {
+    card.isFlipped = true;
+    drawAllCards();
+    
+    if (!firstCard) {
+        firstCard = card;
+    } else {
+        secondCard = card;
+        isProcessing = true;
+        setTimeout(checkMatch, 500);
+    }
+}
+
+function checkMatch() {
+    if (firstCard.imagePath === secondCard.imagePath) {
+        firstCard.isMatched = true;
+        secondCard.isMatched = true;
+        matchedPairs++;
+        score += 10;
+        document.getElementById("scoreDisplay").textContent = score;
+        
+        if (matchedPairs === TOTAL_PAIRS) {
+            endGame();
+        }
+    } else {
+        firstCard.isFlipped = false;
+        secondCard.isFlipped = false;
+        score = Math.max(0, score - 2);
+        document.getElementById("scoreDisplay").textContent = score;
+    }
+    
+    firstCard = null;
+    secondCard = null;
+    isProcessing = false;
+    drawAllCards();
+}
+
+// Keep all your existing game management functions (startGame, endGame, etc.)
+// Only need to modify them to use canvas instead of DOM elements
+
 function startGame() {
-    document.querySelector('main').style.backgroundImage = "url('logo/bg.jpg')";
     document.getElementById("startScreen").style.display = "none";
     document.getElementById("gameContainer").style.display = "block";
     
-    
     matchedPairs = 0;
-    seconds = timeLimit; // Set time to limit
-    document.getElementById("time").textContent = formatTime(seconds); // Hiển thị thời gian ban đầu
+    seconds = 0;
+    score = 0;
+    document.getElementById("time").textContent = "00";
+    document.getElementById("scoreDisplay").textContent = "0";
     
     createCards();
     
     clearInterval(timer);
     timer = setInterval(updateTimer, 1000);
-}
-
-
-// Update timer
-function updateTimer() {
-    if (!isPaused) {
-        seconds--; // Giảm 1 giây mỗi lần gọi hàm
-        
-        // Cập nhật thời gian
-        const formattedTime = formatTime(seconds);
-        document.getElementById("time").textContent = formattedTime;
-
-        // Nếu thời gian kết thúc
-        if (seconds <= 0) {
+    
+    if (timeLimit > 0) {
+        clearTimeout(gameTimer);
+        gameTimer = setTimeout(() => {
             clearInterval(timer);
-            window.location.href = "gameover.html"; // Chuyển hướng sang trang gameover.html
-        }
+            alert(`Time's up! Your score: ${score}`);
+            restartGame();
+        }, timeLimit * 1000);
     }
 }
 
-// Hàm định dạng thời gian
-function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);  // Tính số phút
-    const remainingSeconds = seconds % 60;     // Tính số giây còn lại
-
-    // Trả về chuỗi thời gian theo định dạng '00:00'
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+function updateTimer() {
+    if (!isPaused) {
+        seconds++;
+        document.getElementById("time").textContent = seconds.toString().padStart(2, '0');
+    }
 }
 
-
-// End the game
 function endGame() {
     clearInterval(timer);
-    window.location.href = "complete.html"; // Redirect to win page
+    clearTimeout(gameTimer);
+    document.getElementById("gameContainer").style.display = "none";
+    document.getElementById("congratsScreen").style.display = "block";
+    document.getElementById("finalTime").textContent = seconds;
+    document.getElementById("finalScore").textContent = score;
 }
 
-// Restart the game
+function togglePause() {
+    isPaused = !isPaused;
+    document.querySelector(".btn-pause").textContent = isPaused ? "Resume" : "Pause";
+    if (!isPaused) {
+        drawAllCards();
+    }
+}
+
+function exitGame() {
+    if (confirm("Are you sure you want to exit?")) {
+        restartGame();
+    }
+}
+
 function restartGame() {
     location.reload();
 }
 
-// Show settings screen
 function showSettings() {
     document.getElementById("startScreen").style.display = "none";
     document.getElementById("settingsScreen").style.display = "block";
 }
 
-// Save settings
 function saveSettings() {
     timeLimit = parseInt(document.getElementById("timeLimit").value);
     document.getElementById("settingsScreen").style.display = "none";
     document.getElementById("startScreen").style.display = "block";
 }
-
-// Nếu truy cập với ?start=true thì tự động bắt đầu game
-document.addEventListener("DOMContentLoaded", () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const shouldStartGame = urlParams.get("start");
-
-    if (shouldStartGame === "true" && typeof startGame === "function") {
-        startGame();
-    }
-});
-
