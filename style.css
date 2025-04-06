@@ -87,25 +87,6 @@ h2 {
     gap: 10px;
 }
 
-/* description */
-.description {
-    margin-top: 20px; /* Adds space between buttons and description */
-}
-
-.description-title {
-    font-weight: bold;
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: #2E8B57; /* Green color to match your theme */
-}
-
-.description-content {
-    font-style: italic;
-    font-size: 14px; /* 2-3px smaller than default text */
-    line-height: 1.5;
-    color: #555;
-}
-
 /* card */
 .card {
     aspect-ratio: 3/4;
@@ -116,8 +97,8 @@ h2 {
     font-size: 24px;
     border-radius: 35px !important;
     cursor: pointer;
-    transition: transform 0.3s;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    /* transition: transform 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); */
     position: relative;
     overflow: hidden;
 }
@@ -130,7 +111,6 @@ h2 {
 }
 
 .card::before {
-
     position: absolute;
     top: 50%;
     left: 50%;
@@ -145,7 +125,6 @@ h2 {
 }
 
 .card.flipped {
-    background: #FFD700;
     transform: rotateY(360deg);
     transition-delay: 5ms;
 }
