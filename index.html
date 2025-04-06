@@ -1,24 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <link rel="stylesheet" href="style.css">
+    <title>Trúc Xanh - VPBank</title>
+    <link rel="stylesheet" href="style2.css">
 </head>
 <body>
-    <main>
-        <div id="startScreen" style="display: none;"></div>
+    <div class="content">
+        <div class="container">
+            <input type="text" placeholder="Họ & Tên">
+            <input type="text" placeholder="Phòng ban">
+            <input type="text" placeholder="Số điện thoại">
+            <!-- startScreen.html -->
+            <button id="startGameButton" class="button" window.location.href='gameplay.html?start=true'>
+                Tham gia Game
+            </button>
+            <script>
+                document.getElementById("startGameButton").addEventListener("click", function () {
+                // Nếu bạn muốn lưu dữ liệu nhập vào:
+                 localStorage.setItem("name", document.querySelectorAll("input")[0].value);
 
-    <div id="gameContainer" style="display: none;">
-        <div class="info-panel text-center mt-4">
-            <div class="timer text-xl font-bold text-red-600">
-                <span id="time">00</span>
-            </div>
+                // Chuyển hướng và thêm ?start=true
+                window.location.href = "gameplay.html?start=true";
+            });
+            </script>
         </div>
-        <canvas id="gameCanvas" class="mt-4 border w-full h-60"></canvas>
     </div>
-    </main>
-    <script src="script.js"></script>
 </body>
 </html>
+

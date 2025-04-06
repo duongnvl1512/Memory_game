@@ -4,8 +4,8 @@ const CARD_HEIGHT = 135;
 const CARD_PADDING = 10;
 const TOTAL_PAIRS = 6;
 const IMAGE_PATHS = [
-    'images/landmark1.jpg', 'images/landmark2.jpg', 'images/landmark3.jpg',
-    'images/landmark4.jpg', 'images/landmark5.jpg', 'images/landmark6.jpg'
+    'images/FobiddenCity.jpg', 'images/GreatWallofChina.jpg', 'images/Li-Giang.jpg',
+    'images/PotalaPalace.jpg', 'images/TheBund.jpg', 'images/Tuojiang.webp'
 ];
 
 // Game state
@@ -16,9 +16,11 @@ let matchedPairs = 0;
 let isProcessing = false;
 let isPaused = false;
 let timer = null;
-let timeLimit = 10;
+let timeLimit = 100;
 let seconds = timeLimit;
 let images = {};
+// Các biến audio (KHAI BÁO, nhưng CHƯA gán giá trị)
+let clickSound, matchSound, nomatchSound;
 
 // Initialize game
 document.addEventListener("DOMContentLoaded", () => {
@@ -41,11 +43,22 @@ document.addEventListener("DOMContentLoaded", () => {
     
     if (startButton) {
         startButton.addEventListener("click", () => {
-            window.location.href = "index.html"; // Chuyển hướng sang trang chơi game
+            window.location.href = "gameplay.html"; // Chuyển hướng sang trang chơi game
         });
     }
 });
 
+
+
+// Hàm phát âm thanh
+function playSound(sound) {
+    if (sound) {
+        sound.currentTime = 0;
+        sound.play();
+    } else {
+        console.error("Âm thanh không tồn tại!");
+    }
+}
 
 // Load images
 async function loadImages() {
@@ -56,8 +69,15 @@ async function loadImages() {
 
     // Wait for all images to load
     await Promise.all([...loadPromises, backImagePromise]);
-}
 
+    clickSound = document.getElementById('clickSound');
+    matchSound = document.getElementById('matchSound');
+    nomatchSound = document.getElementById('nomatchSound');
+
+    // *** DI CHUYỂN createCards() VÀO ĐÂY ***
+    createCards(); 
+    drawAllCards(); // Vẽ các thẻ sau khi tạo
+}
 // Helper function to load an image
 function loadImage(path) {
     return new Promise((resolve, reject) => {
@@ -143,14 +163,11 @@ function createCards() {
             }
         }
     }
-    
-    drawAllCards();
 }
 
 // Draw all cards
 function drawAllCards() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
     cards.forEach(card => {
         if (card.isMatched) {
             drawMatchedCard(card);
@@ -231,10 +248,6 @@ function drawFlippedCard(card) {
         drawErrorCard(card);
     }
     
-    // Yellow border on flipped card
-    ctx.strokeStyle = '#FFD700';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(card.x, card.y, card.width, card.height);
 }
 
 // Draw error card
@@ -289,10 +302,12 @@ function flipCard(card) {
     
     if (!firstCard) {
         firstCard = card;
+        playSound(clickSound); // Play click sound
     } else {
         secondCard = card;
         isProcessing = true;
         setTimeout(checkMatch, 500);
+        playSound(clickSound); // Play click sound
     }
 }
 
@@ -302,13 +317,14 @@ function checkMatch() {
         firstCard.isMatched = true;
         secondCard.isMatched = true;
         matchedPairs++;
-        
+        playSound(matchSound); // Play match sound
         if (matchedPairs === TOTAL_PAIRS) {
             endGame();
         }
     } else {
         firstCard.isFlipped = false;
         secondCard.isFlipped = false;
+        playSound(nomatchSound); // Play no match sound
     }
     
     firstCard = null;
@@ -329,6 +345,7 @@ function startGame() {
     document.getElementById("time").textContent = formatTime(seconds); // Hiển thị thời gian ban đầu
     
     createCards();
+    drawAllCards(); // Thêm dòng này để vẽ tất cả các thẻ khi bắt đầu
     
     clearInterval(timer);
     timer = setInterval(updateTimer, 1000);
@@ -373,19 +390,6 @@ function restartGame() {
     location.reload();
 }
 
-// Show settings screen
-function showSettings() {
-    document.getElementById("startScreen").style.display = "none";
-    document.getElementById("settingsScreen").style.display = "block";
-}
-
-// Save settings
-function saveSettings() {
-    timeLimit = parseInt(document.getElementById("timeLimit").value);
-    document.getElementById("settingsScreen").style.display = "none";
-    document.getElementById("startScreen").style.display = "block";
-}
-
 // Nếu truy cập với ?start=true thì tự động bắt đầu game
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -395,4 +399,3 @@ document.addEventListener("DOMContentLoaded", () => {
         startGame();
     }
 });
-
