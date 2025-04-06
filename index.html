@@ -3,27 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trúc Xanh - VPBank</title>
+        
     <link rel="stylesheet" href="style2.css">
 </head>
 <body>
     <div class="content">
         <div class="container">
-            <input type="text" placeholder="Họ & Tên">
+            <input type="text" placeholder="Họ & Tên" style="color: #8CD860;">
             <input type="text" placeholder="Phòng ban">
             <input type="text" placeholder="Số điện thoại">
             <!-- startScreen.html -->
             <button id="startGameButton" class="button" window.location.href='gameplay.html?start=true'>
-                Tham gia Game
+                THAM GIA GAME
             </button>
             <script>
-                document.getElementById("startGameButton").addEventListener("click", function () {
-                // Nếu bạn muốn lưu dữ liệu nhập vào:
-                 localStorage.setItem("name", document.querySelectorAll("input")[0].value);
+                // Lấy các input và nút "Tham gia game"
+                const hoTenInput = document.querySelector('input[placeholder="Họ & Tên"]');
+                const phongBanInput = document.querySelector('input[placeholder="Phòng ban"]');
+                const soDienThoaiInput = document.querySelector('input[placeholder="Số điện thoại"]');
+                const thamGiaGameButton = document.getElementById("startGameButton"); // Sử dụng ID
 
-                // Chuyển hướng và thêm ?start=true
-                window.location.href = "gameplay.html?start=true";
-            });
+                // Hàm kiểm tra xem tất cả các input đã được điền đầy đủ chưa
+                function kiemTraInput() {
+                if (hoTenInput.value && phongBanInput.value && soDienThoaiInput.value) {
+                    return true;
+                } else {
+                    alert('Vui lòng nhập đầy đủ thông tin.');
+                    return false;
+                }
+                }
+
+                // Gắn sự kiện click cho nút "Tham gia game"
+                thamGiaGameButton.addEventListener('click', function(event) {
+                if (kiemTraInput()) {
+                    // Lưu trữ dữ liệu vào localStorage
+                    localStorage.setItem("name", hoTenInput.value);
+                    localStorage.setItem("phongBan", phongBanInput.value);
+                    localStorage.setItem("soDienThoai", soDienThoaiInput.value);
+
+                    // Chuyển hướng đến gameplay.html?start=true
+                    window.location.href = "gameplay.html?start=true";
+                } else {
+                    event.preventDefault(); // Ngăn chặn hành động mặc định của nút
+                }
+                });
             </script>
         </div>
     </div>

@@ -299,7 +299,7 @@ function drawMatchedCard(card) {
     }
 
     // Green highlight for matched card with rounded corners
-    ctx.fillStyle = 'rgba(86, 251, 86, 0.54)'; // Màu xanh trong suốt
+    ctx.fillStyle = 'rgba(86, 251, 86, 0.39)'; // Màu xanh trong suốt
     ctx.beginPath();
     const radius = 20;
     ctx.moveTo(card.x + radius, card.y);

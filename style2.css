@@ -45,11 +45,15 @@ input {
     width: 75%;
     padding: 8px;
     border-radius: 30px;
-    border: 1px solid #127c25;
+    border: 1px solid #8CD860;
     font-size: 10px;
-    color: #00e62a!important;
+    color: #8CD860;
     outline: none;
     font-style: italic;
+}
+
+input::placeholder {
+    color: #8CD860; /* Thay đổi màu placeholder ở đây */
 }
 
 .button {
@@ -67,5 +71,5 @@ input {
 }
 
 .button:hover {
-    background: #24d541;
+    background: #00A024;
 }
