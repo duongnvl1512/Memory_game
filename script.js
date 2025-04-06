@@ -8,6 +8,16 @@ const IMAGE_PATHS = [
     'images/PotalaPalace.jpg', 'images/TheBund.jpg', 'images/Tuojiang.webp'
 ];
 
+// gift content
+const matchMessages = [
+    "0% Phí ngoại tệ tại Trung Quốc", 
+    "Quà chào mừng Hoàn tiền 400k", 
+    "Miễn phí thường niên", 
+    "1.5% Phí ngoại tệ tại nước khác", 
+    "Hoàn tiền 4% Giao dịch quốc tế", 
+    "Hoàn tiền 3% các giao dịch nội địa"
+];
+
 // Game state
 let canvas, ctx;
 let cards = [];
@@ -16,7 +26,7 @@ let matchedPairs = 0;
 let isProcessing = false;
 let isPaused = false;
 let timer = null;
-let timeLimit = 100;
+let timeLimit = 15;
 let seconds = timeLimit;
 let images = {};
 // Các biến audio (KHAI BÁO, nhưng CHƯA gán giá trị)
@@ -48,15 +58,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-
-
 // Hàm phát âm thanh
 function playSound(sound) {
     if (sound) {
         sound.currentTime = 0;
         sound.play();
     } else {
-        console.error("Âm thanh không tồn tại!");
+        console.error("Sounds is not existed!");
     }
 }
 
@@ -74,10 +82,11 @@ async function loadImages() {
     matchSound = document.getElementById('matchSound');
     nomatchSound = document.getElementById('nomatchSound');
 
-    // *** DI CHUYỂN createCards() VÀO ĐÂY ***
-    createCards(); 
-    drawAllCards(); // Vẽ các thẻ sau khi tạo
+    createCards();  // Create cards after loading images
+    drawAllCards(); // Draw all cards after loading images
+    console.log("All images loaded and cards created");
 }
+
 // Helper function to load an image
 function loadImage(path) {
     return new Promise((resolve, reject) => {
@@ -158,7 +167,8 @@ function createCards() {
                     height: CARD_HEIGHT,
                     imagePath: allPaths[index],  // Set image for card
                     isFlipped: false,
-                    isMatched: false
+                    isMatched: false,
+                    matchMessage: null
                 });
             }
         }
@@ -212,7 +222,6 @@ function drawCardBack(card) {
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 2;
     ctx.stroke();
-
     ctx.restore();
 }
 
@@ -245,9 +254,8 @@ function drawFlippedCard(card) {
         
         ctx.restore();
     } else {
-        drawErrorCard(card);
-    }
-    
+        drawErrorCard(card); // Draw error card if image not loaded
+    }  
 }
 
 // Draw error card
@@ -284,16 +292,64 @@ function drawMatchedCard(card) {
 
         // Draw image
         ctx.drawImage(img, card.x, card.y, card.width, card.height);
-        
+
         ctx.restore();
     } else {
         drawErrorCard(card);
     }
 
-    // Green highlight for matched card
-    ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
-    ctx.fillRect(card.x, card.y, card.width, card.height);
+    // Green highlight for matched card with rounded corners
+    ctx.fillStyle = 'rgba(86, 251, 86, 0.54)'; // Màu xanh trong suốt
+    ctx.beginPath();
+    const radius = 20;
+    ctx.moveTo(card.x + radius, card.y);
+    ctx.lineTo(card.x + card.width - radius, card.y);
+    ctx.quadraticCurveTo(card.x + card.width, card.y, card.x + card.width, card.y + radius);
+    ctx.lineTo(card.x + card.width, card.y + card.height - radius);
+    ctx.quadraticCurveTo(card.x + card.width, card.y + card.height, card.x + card.width - radius, card.y + card.height);
+    ctx.lineTo(card.x + radius, card.y + card.height);
+    ctx.quadraticCurveTo(card.x, card.y + card.height, card.x, card.y + card.height - radius);
+    ctx.lineTo(card.x, card.y + radius);
+    ctx.quadraticCurveTo(card.x, card.y, card.x + radius, card.y);
+    ctx.closePath();
+    ctx.fill();
+
+    // ✅ Draw match message if available
+    if (card.isMatched && card.matchMessage) {
+        ctx.fillStyle = 'white'; // Màu chữ trắng
+        ctx.font = 'bold 16px Gilroy';
+        ctx.textAlign = 'center';
+
+        const text = card.matchMessage;
+        const maxWidth = card.width - 10;
+        const lineHeight = 20;
+
+        // Đo chiều cao của text
+        const textMetrics = ctx.measureText(text);
+        const textHeight = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent;
+
+        // Tính toán vị trí y để căn giữa theo chiều dọc
+        let y = card.y + card.height / 2 - textHeight / 2 - 5;
+
+        const words = text.split(' ');
+        let line = '';
+
+        for (let n = 0; n < words.length; n++) {
+            const testLine = line + words[n] + ' ';
+            const metrics = ctx.measureText(testLine);
+            const testWidth = metrics.width;
+            if (testWidth > maxWidth && n > 0) {
+                ctx.fillText(line, card.x + card.width / 2, y);
+                line = words[n] + ' ';
+                y += lineHeight;
+            } else {
+                line = testLine;
+            }
+        }
+        ctx.fillText(line, card.x + card.width / 2, y);
+    }
 }
+
 
 // Flip card
 function flipCard(card) {
@@ -314,9 +370,14 @@ function flipCard(card) {
 // Check if two flipped cards match
 function checkMatch() {
     if (firstCard.imagePath === secondCard.imagePath) {
+        // Cards match
         firstCard.isMatched = true;
         secondCard.isMatched = true;
+        const randomMessage = matchMessages[Math.floor(Math.random() * matchMessages.length)];
+        firstCard.matchMessage = randomMessage;
+        secondCard.matchMessage = randomMessage;    
         matchedPairs++;
+
         playSound(matchSound); // Play match sound
         if (matchedPairs === TOTAL_PAIRS) {
             endGame();
