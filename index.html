@@ -3,30 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trúc Xanh - VPBank</title>
-    <link rel="stylesheet" href="style2.css">
+    <link rel="stylesheet" href="style2.css?t=1123">
 </head>
 <body>
     <div class="content">
         <div class="container">
-            <input type="text" placeholder="Họ & Tên">
-            <input type="text" placeholder="Phòng ban">
-            <input type="text" placeholder="Số điện thoại">
-            <!-- startScreen.html -->
-            <button id="startGameButton" class="button" window.location.href='gameplay.html?start=true'>
-                Tham gia Game
-            </button>
-            <script>
-                document.getElementById("startGameButton").addEventListener("click", function () {
-                // Nếu bạn muốn lưu dữ liệu nhập vào:
-                 localStorage.setItem("name", document.querySelectorAll("input")[0].value);
+            <input id="Hoten" type="text" placeholder="Họ & Tên" style="color: #8CD860;">
+            <div class="error-message" id="error-Hoten"></div>
 
-                // Chuyển hướng và thêm ?start=true
-                window.location.href = "gameplay.html?start=true";
-            });
-            </script>
+            <input id="Phongban" type="text" placeholder="Phòng ban">
+            <div class="error-message" id="error-Phongban"></div>
+
+            <input id="soDienThoai" type="text" placeholder="Số điện thoại">
+            <div class="error-message" id="error-soDienThoai"></div>
+
+            <button id="startGameButton" class="button">
+                THAM GIA GAME
+            </button>
         </div>
-    </div>
+        </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            const hoTenInput = $("#Hoten");
+            const phongBanInput = $("#Phongban");
+            const soDienThoaiInput = $("#soDienThoai");
+            const thamGiaGameButton = $("#startGameButton");
+
+            function laSoDienThoaiHopLe(sdt) {
+                const cleanedSdt = sdt.replace(/[\s-]/g, '');
+                return /^\d{10,11}$/.test(cleanedSdt);
+            }
+
+            function kiemTraInput() {
+                let hasError = false;
+
+                // Reset tất cả thông báo lỗi
+                $(".error-message").text("");
+
+                // Kiểm tra Họ & Tên
+                if (hoTenInput.val().trim() === "") {
+                    $("#error-Hoten").text("Vui lòng nhập Họ & Tên.");
+                    hasError = true;
+                }
+
+                // Kiểm tra Phòng ban
+                if (phongBanInput.val().trim() === "") {
+                    $("#error-Phongban").text("Vui lòng nhập Phòng ban.");
+                    hasError = true;
+                }
+
+                // Kiểm tra Số điện thoại
+                const soDienThoai = soDienThoaiInput.val().trim();
+                if (soDienThoai === "") {
+                    $("#error-soDienThoai").text("Vui lòng nhập Số điện thoại.");
+                    hasError = true;
+                } else if (!laSoDienThoaiHopLe(soDienThoai)) {
+                    $("#error-soDienThoai").text("Số điện thoại không hợp lệ.");
+                    hasError = true;
+                }
+
+                return !hasError;
+            }
+
+            thamGiaGameButton.on('click', function(event) {
+                if (kiemTraInput()) {
+                    localStorage.setItem("name", hoTenInput.val());
+                    localStorage.setItem("phongBan", phongBanInput.val());
+                    localStorage.setItem("soDienThoai", soDienThoaiInput.val());
+                    window.location.href = "gameplay.html?start=true";
+                } else {
+                    event.preventDefault();
+                }
+            });
+
+            // Xóa thông báo lỗi khi người dùng bắt đầu nhập liệu lại
+            hoTenInput.on('input', function() {
+                $("#error-Hoten").text("");
+            });
+
+            phongBanInput.on('input', function() {
+                $("#error-Phongban").text("");
+            });
+
+            soDienThoaiInput.on('input', function() {
+                $("#error-soDienThoai").text("");
+            });
+        });
+    </script>
 </body>
 </html>
-

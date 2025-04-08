@@ -4,8 +4,8 @@ const CARD_HEIGHT = 135;
 const CARD_PADDING = 10;
 const TOTAL_PAIRS = 6;
 const IMAGE_PATHS = [
-    'images/FobiddenCity.jpg', 'images/GreatWallofChina.jpg', 'images/Li-Giang.jpg',
-    'images/PotalaPalace.jpg', 'images/TheBund.jpg', 'images/Tuojiang.webp'
+    'images/Layer 1.jpg', 'images/Layer 2.jpg', 'images/Layer 3.jpg',
+    'images/Layer 4.jpg', 'images/Layer 5.jpg', 'images/Layer 6.jpg'
 ];
 
 // Game state
@@ -16,7 +16,7 @@ let matchedPairs = 0;
 let isProcessing = false;
 let isPaused = false;
 let timer = null;
-let timeLimit = 100;
+let timeLimit = 15;
 let seconds = timeLimit;
 let images = {};
 // Các biến audio (KHAI BÁO, nhưng CHƯA gán giá trị)
@@ -48,15 +48,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-
-
 // Hàm phát âm thanh
 function playSound(sound) {
     if (sound) {
         sound.currentTime = 0;
         sound.play();
     } else {
-        console.error("Âm thanh không tồn tại!");
+        console.error("Sounds is not existed!");
     }
 }
 
@@ -74,10 +72,11 @@ async function loadImages() {
     matchSound = document.getElementById('matchSound');
     nomatchSound = document.getElementById('nomatchSound');
 
-    // *** DI CHUYỂN createCards() VÀO ĐÂY ***
-    createCards(); 
-    drawAllCards(); // Vẽ các thẻ sau khi tạo
+    createCards();  // Create cards after loading images
+    drawAllCards(); // Draw all cards after loading images
+    console.log("All images loaded and cards created");
 }
+
 // Helper function to load an image
 function loadImage(path) {
     return new Promise((resolve, reject) => {
@@ -139,7 +138,7 @@ function handleCanvasClick(e) {
 // Create cards
 function createCards() {
     cards = [];
-    const allPaths = [...IMAGE_PATHS, ...IMAGE_PATHS];
+    const allPaths = [...IMAGE_PATHS, ...IMAGE_PATHS]; // Doubled IMAGE_PATHS here
     allPaths.sort(() => Math.random() - 0.5);
     
     const cols = 4;
@@ -158,7 +157,7 @@ function createCards() {
                     height: CARD_HEIGHT,
                     imagePath: allPaths[index],  // Set image for card
                     isFlipped: false,
-                    isMatched: false
+                    isMatched: false,
                 });
             }
         }
@@ -212,7 +211,6 @@ function drawCardBack(card) {
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 2;
     ctx.stroke();
-
     ctx.restore();
 }
 
@@ -245,9 +243,8 @@ function drawFlippedCard(card) {
         
         ctx.restore();
     } else {
-        drawErrorCard(card);
-    }
-    
+        drawErrorCard(card); // Draw error card if image not loaded
+    }   
 }
 
 // Draw error card
@@ -284,16 +281,29 @@ function drawMatchedCard(card) {
 
         // Draw image
         ctx.drawImage(img, card.x, card.y, card.width, card.height);
-        
+
         ctx.restore();
     } else {
         drawErrorCard(card);
     }
 
-    // Green highlight for matched card
-    ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
-    ctx.fillRect(card.x, card.y, card.width, card.height);
+    // Green highlight for matched card with rounded corners
+    ctx.fillStyle = 'rgba(86, 251, 86, 0.39)'; // Màu xanh trong suốt
+    ctx.beginPath();
+    const radius = 20;
+    ctx.moveTo(card.x + radius, card.y);
+    ctx.lineTo(card.x + card.width - radius, card.y);
+    ctx.quadraticCurveTo(card.x + card.width, card.y, card.x + card.width, card.y + radius);
+    ctx.lineTo(card.x + card.width, card.y + card.height - radius);
+    ctx.quadraticCurveTo(card.x + card.width, card.y + card.height, card.x + card.width - radius, card.y + card.height);
+    ctx.lineTo(card.x + radius, card.y + card.height);
+    ctx.quadraticCurveTo(card.x, card.y + card.height, card.x, card.y + card.height - radius);
+    ctx.lineTo(card.x, card.y + radius);
+    ctx.quadraticCurveTo(card.x, card.y, card.x + radius, card.y);
+    ctx.closePath();
+    ctx.fill();
 }
+
 
 // Flip card
 function flipCard(card) {
@@ -314,9 +324,11 @@ function flipCard(card) {
 // Check if two flipped cards match
 function checkMatch() {
     if (firstCard.imagePath === secondCard.imagePath) {
+        // Cards match
         firstCard.isMatched = true;
         secondCard.isMatched = true;
         matchedPairs++;
+
         playSound(matchSound); // Play match sound
         if (matchedPairs === TOTAL_PAIRS) {
             endGame();
