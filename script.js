@@ -4,18 +4,8 @@ const CARD_HEIGHT = 135;
 const CARD_PADDING = 10;
 const TOTAL_PAIRS = 6;
 const IMAGE_PATHS = [
-    'images/FobiddenCity.jpg', 'images/GreatWallofChina.jpg', 'images/Li-Giang.jpg',
-    'images/PotalaPalace.jpg', 'images/TheBund.jpg', 'images/Tuojiang.webp'
-];
-
-// gift content
-const matchMessages = [
-    "0% Phí ngoại tệ tại Trung Quốc", 
-    "Quà chào mừng Hoàn tiền 400k", 
-    "Miễn phí thường niên", 
-    "1.5% Phí ngoại tệ tại nước khác", 
-    "Hoàn tiền 4% Giao dịch quốc tế", 
-    "Hoàn tiền 3% các giao dịch nội địa"
+    'images/Layer 1.jpg', 'images/Layer 2.jpg', 'images/Layer 3.jpg',
+    'images/Layer 4.jpg', 'images/Layer 5.jpg', 'images/Layer 6.jpg'
 ];
 
 // Game state
@@ -148,7 +138,7 @@ function handleCanvasClick(e) {
 // Create cards
 function createCards() {
     cards = [];
-    const allPaths = [...IMAGE_PATHS, ...IMAGE_PATHS];
+    const allPaths = [...IMAGE_PATHS, ...IMAGE_PATHS]; // Doubled IMAGE_PATHS here
     allPaths.sort(() => Math.random() - 0.5);
     
     const cols = 4;
@@ -168,7 +158,6 @@ function createCards() {
                     imagePath: allPaths[index],  // Set image for card
                     isFlipped: false,
                     isMatched: false,
-                    matchMessage: null
                 });
             }
         }
@@ -255,7 +244,7 @@ function drawFlippedCard(card) {
         ctx.restore();
     } else {
         drawErrorCard(card); // Draw error card if image not loaded
-    }  
+    }   
 }
 
 // Draw error card
@@ -313,41 +302,6 @@ function drawMatchedCard(card) {
     ctx.quadraticCurveTo(card.x, card.y, card.x + radius, card.y);
     ctx.closePath();
     ctx.fill();
-
-    // ✅ Draw match message if available
-    if (card.isMatched && card.matchMessage) {
-        ctx.fillStyle = 'white'; // Màu chữ trắng
-        ctx.font = 'bold 16px Gilroy';
-        ctx.textAlign = 'center';
-
-        const text = card.matchMessage;
-        const maxWidth = card.width - 10;
-        const lineHeight = 20;
-
-        // Đo chiều cao của text
-        const textMetrics = ctx.measureText(text);
-        const textHeight = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent;
-
-        // Tính toán vị trí y để căn giữa theo chiều dọc
-        let y = card.y + card.height / 2 - textHeight / 2 - 5;
-
-        const words = text.split(' ');
-        let line = '';
-
-        for (let n = 0; n < words.length; n++) {
-            const testLine = line + words[n] + ' ';
-            const metrics = ctx.measureText(testLine);
-            const testWidth = metrics.width;
-            if (testWidth > maxWidth && n > 0) {
-                ctx.fillText(line, card.x + card.width / 2, y);
-                line = words[n] + ' ';
-                y += lineHeight;
-            } else {
-                line = testLine;
-            }
-        }
-        ctx.fillText(line, card.x + card.width / 2, y);
-    }
 }
 
 
@@ -373,9 +327,6 @@ function checkMatch() {
         // Cards match
         firstCard.isMatched = true;
         secondCard.isMatched = true;
-        const randomMessage = matchMessages[Math.floor(Math.random() * matchMessages.length)];
-        firstCard.matchMessage = randomMessage;
-        secondCard.matchMessage = randomMessage;    
         matchedPairs++;
 
         playSound(matchSound); // Play match sound
